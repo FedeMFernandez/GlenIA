@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: gleni-ops-assistant
+    env: node
+    plan: free
+    # The backend lives in the backend/ folder of the monorepo. Render runs the
+    # build/start commands from this directory. The frontend (sibling folder
+    # ../frontend) is resolved by App.ts relative to the compiled module, so it
+    # is served in production too — no extra config needed.
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    # All environment variables are configured manually in the Render dashboard
+    # (Environment tab). None are committed here. See .env.example for the list
+    # of variables the app expects.

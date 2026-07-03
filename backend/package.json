@@ -1,0 +1,46 @@
+{
+  "name": "gleni-ops-assistant",
+  "version": "1.0.0",
+  "description": "Transactional chat assistant over a mocked external transactions provider",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "worker": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "migration:run": "tsx ./node_modules/typeorm/cli.js migration:run -d src/infrastructure/database/dataSource.ts",
+    "migration:revert": "tsx ./node_modules/typeorm/cli.js migration:revert -d src/infrastructure/database/dataSource.ts",
+    "migration:generate": "tsx ./node_modules/typeorm/cli.js migration:generate src/infrastructure/database/migrations/Migration -d src/infrastructure/database/dataSource.ts"
+  },
+  "dependencies": {
+    "bullmq": "^5.13.2",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "ioredis": "^5.4.1",
+    "openai": "^4.67.3",
+    "pg": "^8.13.1",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.7.4",
+    "@types/uuid": "^10.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.9"
+  }
+}
