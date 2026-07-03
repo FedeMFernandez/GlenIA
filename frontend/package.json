@@ -1,6 +1,0 @@
-{
-  "name": "gleni-frontend",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Gleni static chat UI. No dependencies and no build step — served same-origin by the backend."
-}

@@ -1,5 +1,5 @@
 {
-  "name": "gleni-ops-assistant",
+  "name": "glenia-ops-assistant",
   "version": "1.0.0",
   "description": "Transactional chat assistant over a mocked external transactions provider",
   "main": "./dist/index.js",

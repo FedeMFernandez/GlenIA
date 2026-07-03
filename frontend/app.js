@@ -1,4 +1,7 @@
-const API_ORIGIN = (window.GLENI_API_BASE || '').replace(/\/$/, '');
+// The backend serves this UI and the API from the same origin, so all calls are
+// relative. To target a different API origin, set API_ORIGIN to its base URL
+// (no trailing slash) and add that UI origin to CORS_ORIGINS on the backend.
+const API_ORIGIN = '';
 const API_BASE = `${API_ORIGIN}/api/v1`;
 const STORAGE_KEY = 'chatAssistant.conversationId';
 const MAX_MESSAGE_LENGTH = 2000;

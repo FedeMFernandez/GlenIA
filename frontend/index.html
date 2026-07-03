@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#1668ff" />
-    <title>Gleni · Transactions Assistant</title>
+    <title>GlenIA · Transactions Assistant</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -22,7 +22,7 @@
     <script>
       (function () {
         try {
-          var saved = localStorage.getItem('gleni.theme');
+          var saved = localStorage.getItem('glenia.theme');
           var theme =
             saved ||
             (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -47,7 +47,7 @@
             <i class="bi bi-robot robot-fallback" aria-hidden="true"></i>
           </div>
           <div class="brand-text d-flex flex-column lh-1">
-            <span class="brand-name">Gleni</span>
+            <span class="brand-name">GlenIA</span>
             <span class="brand-tagline small">
               <span class="text-body-secondary">Transactions Assistant</span>
               <span class="status-online is-connecting" id="presence-indicator">
@@ -173,8 +173,8 @@
                 <textarea
                   id="message-input"
                   class="message-input form-control"
-                  placeholder="Message Gleni..."
-                  aria-label="Message Gleni"
+                  placeholder="Message GlenIA..."
+                  aria-label="Message GlenIA"
                   rows="1"
                   maxlength="2000"
                 ></textarea>
@@ -223,7 +223,6 @@
       crossorigin="anonymous"
     ></script>
 
-    <script src="/env.js"></script>
     <script type="module" src="/app.js"></script>
 
     <script>
@@ -238,7 +237,7 @@
             var next = current === 'dark' ? 'light' : 'dark';
             root.setAttribute('data-bs-theme', next);
             try {
-              localStorage.setItem('gleni.theme', next);
+              localStorage.setItem('glenia.theme', next);
             } catch (e) {}
           });
         }

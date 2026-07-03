@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: gleni-ops-assistant
+    name: glenia-ops-assistant
     env: node
     plan: free
     # The backend lives in the backend/ folder of the monorepo. Render runs the

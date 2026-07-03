@@ -1,6 +1,6 @@
-# Gleni — Transactions Operations Assistant
+# GlenIA — Transactions Operations Assistant
 
-Gleni is a conversational operations assistant for payments and money-movement teams. Operators describe what they need in plain language — "send a $500 payout to acct-91", "what happened to the last refund?", "list the transfers that failed today" — and Gleni interprets the intent, triggers or reads the right transaction, and answers with real, auditable state.
+GlenIA is a conversational operations assistant for payments and money-movement teams. Operators describe what they need in plain language — "send a $500 payout to acct-91", "what happened to the last refund?", "list the transfers that failed today" — and GlenIA interprets the intent, triggers or reads the right transaction, and answers with real, auditable state.
 
 Under the chat surface is a reliability-first transaction engine: every money-movement action is idempotent, processed asynchronously, retried with backoff on transient failures, and never left stuck in a non-terminal state. The external payments rail sits behind a clean provider port; today it is backed by a **simulation adapter** that models real-world failure modes (latency, timeouts, 5xx, rate limits) so the reliability machinery is exercised end-to-end and the adapter can be swapped for a live rail without touching the core.
 
@@ -8,7 +8,7 @@ Under the chat surface is a reliability-first transaction engine: every money-mo
 
 ## Table of contents
 
-1. [What Gleni is](#1-what-gleni-is)
+1. [What GlenIA is](#1-what-glenia-is)
 2. [Key features](#2-key-features)
 3. [Architecture](#3-architecture)
 4. [Tech stack](#4-tech-stack)
@@ -25,13 +25,13 @@ Under the chat surface is a reliability-first transaction engine: every money-mo
 
 ---
 
-## 1. What Gleni is
+## 1. What GlenIA is
 
 **The problem.** Payments and back-office ops teams need a fast, low-friction way to trigger money-movement actions (transfers, payouts, refunds) and to know, with confidence, exactly what happened to each one. Real payment rails are unreliable: they time out, rate-limit, return transient 5xx errors, and occasionally reject requests permanently. Naive integrations lose track of state, double-charge on retries, or leave transactions silently stuck.
 
 **Who it's for.** Fintech and payments engineering teams, plus the support and operations agents who trigger and monitor back-office money movements. More broadly, any product that needs a reliable async-transaction layer behind a natural-language interface.
 
-**The value.** Gleni pairs a chat interface with a transaction engine designed for partial failure. Every transaction is idempotent (double-submit safe), retried with backoff only when it makes sense to retry, always driven to a terminal state, and fully auditable through a per-transaction event trail. Operators get answers grounded in real persisted state — the assistant never invents a transaction id or status.
+**The value.** GlenIA pairs a chat interface with a transaction engine designed for partial failure. Every transaction is idempotent (double-submit safe), retried with backoff only when it makes sense to retry, always driven to a terminal state, and fully auditable through a per-transaction event trail. Operators get answers grounded in real persisted state — the assistant never invents a transaction id or status.
 
 ---
 
@@ -52,7 +52,7 @@ Under the chat surface is a reliability-first transaction engine: every money-mo
 
 ## 3. Architecture
 
-Gleni is a single Git repository with two sibling projects:
+GlenIA is a single Git repository with two sibling projects:
 
 ```
 .
@@ -61,15 +61,13 @@ Gleni is a single Git repository with two sibling projects:
 │   ├── tests/                # Vitest suites (reliability-focused)
 │   ├── render.yaml           # Render deploy (rootDir: backend)
 │   └── .env.example          # variable reference (real .env is gitignored)
-└── frontend/    # Static chat UI (no build step)
+└── frontend/    # Static chat UI (no dependencies, no build step)
     ├── index.html
     ├── app.js
-    ├── env.js                # window.GLENI_API_BASE (empty = same-origin)
-    ├── package.json          # no deps, no build
     └── styles.css
 ```
 
-**Serving the UI.** The backend serves the sibling `frontend/` folder as static files via `express.static`, so the UI and the API share a single origin both locally and in production — all API calls are relative (`/api/v1/...`, `/health`) and there is no CORS or cross-origin concern. `frontend/env.js` sets `window.GLENI_API_BASE = ""` (same-origin); it only needs a non-empty value if you ever want to host the static UI on a different origin than the API.
+**Serving the UI.** The backend serves the sibling `frontend/` folder as static files via `express.static`, so the UI and the API share a single origin both locally and in production — all API calls are relative (`/api/v1/...`, `/health`) and there is no CORS or cross-origin concern. The API base lives in `app.js` as `API_ORIGIN` (empty = same origin); set it to an absolute base URL only if you ever want to host the static UI on a different origin than the API.
 
 ### Hexagonal / clean layering
 
@@ -149,14 +147,14 @@ cd backend
 npm install
 ```
 
-Create your local environment file from the reference and fill in the values. `.env` is gitignored — never commit real secrets. `.env.example` lists every variable Gleni reads.
+Create your local environment file from the reference and fill in the values. `.env` is gitignored — never commit real secrets. `.env.example` lists every variable GlenIA reads.
 
 ```bash
 cp .env.example .env
 # then edit .env and set at least DATABASE_URL, REDIS_URL, OPENAI_API_KEY
 ```
 
-> `DATABASE_URL` is a standard Postgres connection string (e.g. `postgresql://user:pass@host:5432/postgres`). With Supabase, copy it from **Project Settings → Database → Connection string (URI)**. Gleni connects to Postgres directly through TypeORM — it does not use the Supabase JS client or PostgREST.
+> `DATABASE_URL` is a standard Postgres connection string (e.g. `postgresql://user:pass@host:5432/postgres`). With Supabase, copy it from **Project Settings → Database → Connection string (URI)**. GlenIA connects to Postgres directly through TypeORM — it does not use the Supabase JS client or PostgREST.
 
 Run the database migration once to create the schema (`conversations`, `messages`, `transactions`, `transaction_events`, plus indexes and the unique idempotency constraint). `synchronize` is disabled, so schema changes only ever happen through migrations.
 
@@ -304,7 +302,7 @@ Each frame is `event: <name>` followed by a JSON `data:` payload.
 
 ## 8. Reliability & design decisions
 
-Gleni assumes the payments rail will fail. The engineering below is the point of the product, not an afterthought.
+GlenIA assumes the payments rail will fail. The engineering below is the point of the product, not an afterthought.
 
 ### Idempotency
 
@@ -356,11 +354,11 @@ The payments rail is the `TransactionProvider` port. The current `MockTransactio
 
 ## 10. Deployment
 
-Gleni deploys as a **single Render web service** that serves both the API and the static chat UI from one origin. The Node/Express process runs the HTTP server, the BullMQ worker, and the stalled-transaction reaper in-process, and serves the sibling `frontend/` folder via `express.static`. Because the UI and API share an origin, all frontend calls are relative and there is no cross-origin/CORS surface.
+GlenIA deploys as a **single Render web service** that serves both the API and the static chat UI from one origin. The Node/Express process runs the HTTP server, the BullMQ worker, and the stalled-transaction reaper in-process, and serves the sibling `frontend/` folder via `express.static`. Because the UI and API share an origin, all frontend calls are relative and there is no cross-origin/CORS surface.
 
 ```
 Browser ──▶ Render (Node/Express, long-running)
-              ├─ static UI: index.html, app.js, styles.css, env.js  (same origin)
+              ├─ static UI: index.html, app.js, styles.css  (same origin)
               ├─ API:  /api/v1/*  +  /health
               ├─ BullMQ worker + reaper (in-process)
               ├─▶ Postgres (via DATABASE_URL)
@@ -379,8 +377,8 @@ Browser ──▶ Render (Node/Express, long-running)
 
 ### Frontend (served by the backend)
 
-- No separate frontend deploy and no build step. `frontend/env.js` ships `window.GLENI_API_BASE = ""`, so the UI targets the same origin that served it and all API calls stay relative.
-- To host the static UI on a different origin than the API (optional), set `window.GLENI_API_BASE` in `frontend/env.js` to the API base URL (no trailing slash) and add that UI origin to `CORS_ORIGINS` on the backend.
+- No separate frontend deploy, no dependencies, and no build step. `app.js` uses relative paths (`API_ORIGIN = ''`), so the UI targets whatever origin served it and all API calls stay relative — the backend URL is never hardcoded.
+- To host the static UI on a different origin than the API (optional), set `API_ORIGIN` in `frontend/app.js` to the API base URL (no trailing slash) and add that UI origin to `CORS_ORIGINS` on the backend.
 
 ---
 
@@ -435,4 +433,4 @@ npm run test:coverage  # coverage report
 
 ### Secrets handling
 
-Gleni never hardcodes or commits secrets. Every secret (`OPENAI_API_KEY`, `DATABASE_URL`, `REDIS_URL`, …) is read only from the environment via `config/env.ts`; `.env` is gitignored and `.env.example` contains only placeholders. In production, secrets are set in the Render dashboard, not in the repository. Treat any credential that has ever appeared in a committed file or shared document as compromised and rotate it.
+GlenIA never hardcodes or commits secrets. Every secret (`OPENAI_API_KEY`, `DATABASE_URL`, `REDIS_URL`, …) is read only from the environment via `config/env.ts`; `.env` is gitignored and `.env.example` contains only placeholders. In production, secrets are set in the Render dashboard, not in the repository. Treat any credential that has ever appeared in a committed file or shared document as compromised and rotate it.
